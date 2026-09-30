@@ -1,5 +1,0 @@
-services:
-  node:
-    build: ./node
-    container_name: labwatch-node
-    restart: unless-stopped
