@@ -1,0 +1,37 @@
+services:
+  api:
+    build: ./backend
+    container_name: labwatch-api
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "${SERVER_PORT:-8000}:${SERVER_PORT:-8000}"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - labwatch
+
+  db:
+    image: postgres:16
+    container_name: labwatch-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-labwatch}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-labwatch}
+      POSTGRES_DB: ${POSTGRES_DB:-labwatch}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-labwatch}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - labwatch
+
+volumes:
+  pgdata:
+
+networks:
+  labwatch:

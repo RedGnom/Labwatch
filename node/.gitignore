@@ -1,0 +1,13 @@
+.env
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+telemetry_buffer.jsonl
+incidents.jsonl
+.idea/
+.vscode/
+*.log
