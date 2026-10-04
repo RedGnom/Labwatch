@@ -15,8 +15,8 @@ simulation:
 # Пороги и сценарии
 thresholds:
   cpu_temp_c:
-    warn: 70
-    critical: 85
+    warn: 46
+    critical: 47
   case_temp_c:
     warn: 45
     critical: 60
