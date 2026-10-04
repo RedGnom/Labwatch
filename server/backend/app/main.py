@@ -2,7 +2,7 @@
 import logging
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, Header, HTTPException
 from pydantic import BaseModel, Field
 
 from app.config import settings
@@ -20,7 +20,14 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
 )
 log = logging.getLogger("labwatch.api")
+def verify_node_token(x_node_token: str = Header(..., alias="X-Node-Token")) -> None:
+    """Проверка токена узла.
 
+    Заголовок обязателен. Если не совпадает с эталоном — 401.
+    """
+    if x_node_token != settings.node_token:
+        log.warning("rejected telemetry: bad node token")
+        raise HTTPException(status_code=401, detail="invalid node token")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -57,7 +64,10 @@ def health() -> dict:
 
 
 @app.post("/telemetry", status_code=201)
-def post_telemetry(t: TelemetryIn) -> dict:
+def post_telemetry(
+    t: TelemetryIn,
+    _: None = Depends(verify_node_token),
+) -> dict:
     record = storage.save(t.node_id, t.model_dump(exclude={"node_id"}))
     log.info(
         "telemetry from %s: cpu=%.2f case=%.2f hum=%.2f I=%.2f U=%.2f fan=%d",
@@ -65,7 +75,6 @@ def post_telemetry(t: TelemetryIn) -> dict:
         t.current_a, t.voltage_v, t.fan_rpm,
     )
     return {"status": "stored", "record": record}
-
 
 @app.get("/nodes")
 def list_nodes() -> dict:

@@ -16,11 +16,18 @@ log = logging.getLogger(__name__)
 
 
 class Sender:
-    def __init__(self, url: str, buffer_path: Path, timeout: float = 5.0) -> None:
+    def __init__(
+        self,
+        url: str,
+        buffer_path: Path,
+        token: str = "",
+        timeout: float = 5.0,
+    ) -> None:
         self._url = url.rstrip("/")
         self._buffer = Path(buffer_path)
         self._buffer.touch(exist_ok=True)
         self._timeout = timeout
+        self._headers = {"X-Node-Token": token} if token else {}
         self._client = httpx.Client(timeout=timeout)
 
     def send(self, node_id: str, reading: SensorReading) -> bool:
@@ -39,7 +46,11 @@ class Sender:
         self._flush()
 
         try:
-            r = self._client.post(f"{self._url}/telemetry", json=payload)
+            r = self._client.post(
+                f"{self._url}/telemetry",
+                json=payload,
+                headers=self._headers,
+            )
             r.raise_for_status()
             return True
         except Exception as e:
@@ -60,7 +71,7 @@ class Sender:
                 r = self._client.post(
                     f"{self._url}/telemetry",
                     content=line.encode("utf-8"),
-                    headers={"Content-Type": "application/json"},
+                    headers={**self._headers, "Content-Type": "application/json"},
                 )
                 r.raise_for_status()
                 log.info("flushed buffered record")

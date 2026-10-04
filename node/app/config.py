@@ -24,6 +24,7 @@ def load_config(base_dir: Path) -> dict:
     # .env перекрывает yaml
     cfg["server"] = {
         "url": os.environ.get("LABWATCH_URL", "http://localhost:8000"),
+        "token": os.environ.get("LABWATCH_TOKEN", ""),
         "send_interval_seconds": cfg.get("simulation", {}).get("interval_seconds", 5),
     }
     cfg["node"]["id"] = os.environ.get("NODE_ID", cfg["node"]["id"])

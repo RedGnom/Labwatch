@@ -18,10 +18,11 @@ class Settings(BaseSettings):
     postgres_db: str = "labwatch"
     postgres_host: str = "db"
     postgres_port: int = 5432
-
     database_url: str = (
         "postgresql+psycopg://labwatch:labwatch@db:5432/labwatch"
     )
+
+    node_token: str = "dev-node-token-please-change"
 
 
 settings = Settings()

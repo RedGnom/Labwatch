@@ -3,7 +3,6 @@ import logging
 import sys
 import time
 from pathlib import Path
-
 from .actions import Actions
 from .config import load_config
 from .incidents import IncidentLog
@@ -37,6 +36,7 @@ def main() -> int:
     sender = Sender(
         url=server_url,
         buffer_path=base_dir / "telemetry_buffer.jsonl",
+        token=cfg["server"]["token"],
     )
     incidents = IncidentLog(
         path=base_dir / "incidents.jsonl",
