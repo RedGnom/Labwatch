@@ -45,6 +45,7 @@ def main() -> None:
     )
 
     log.info("node id=%s source=%s", node_id, source_kind)
+    log.info("scenario=%s", cfg.get("simulation", {}).get("scenario", "normal"))
     log.info("server url=%s", server_url)
     log.info("sending every %ss. Ctrl+C to stop.", interval)
     log.info("incidents log: %s (%d records)", incidents.path, incidents.count())

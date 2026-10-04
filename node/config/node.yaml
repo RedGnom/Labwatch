@@ -11,7 +11,7 @@ sensor_source: simulated
 simulation:
   interval_seconds: 5        # как часто "снимаем" показания
   seed: 42                   # для воспроизводимости
-
+  scenario: overheat
 # Пороги и сценарии
 thresholds:
   cpu_temp_c:
