@@ -64,6 +64,30 @@ class IncidentLog:
                     )
         return changed
 
+    def record_system(
+        self,
+        kind: str,
+        message: str,
+        **extra,
+    ) -> None:
+        """Записать системное событие (не связанное с параметром).
+
+        kind — короткий тип события, например "watchdog_triggered".
+        message — человекочитаемое описание.
+        extra — произвольные дополнительные поля.
+        """
+        record = {
+            "ts": datetime.now(timezone.utc).isoformat(),
+            "node_id": self._node_id,
+            "kind": kind,
+            "message": message,
+            **extra,
+        }
+        with self._lock:
+            with self._path.open("a", encoding="utf-8") as f:
+                f.write(json.dumps(record, ensure_ascii=False) + "\n")
+        log.error("system incident [%s]: %s", kind, message)
+
     def count(self) -> int:
         """Сколько всего записей в журнале."""
         if not self._path.exists():
