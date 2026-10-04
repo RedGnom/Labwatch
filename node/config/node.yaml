@@ -30,7 +30,6 @@ thresholds:
     min: 11.5
     max: 12.8
   fan_rpm:
-    min: 500
     max: 3000
 
 # Поведение при инцидентах

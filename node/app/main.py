@@ -2,7 +2,7 @@
 import logging
 import time
 from pathlib import Path
-
+from .thresholds import evaluate
 from .config import load_config
 from .sender import Sender
 from .sensors import create_sensor_source
@@ -36,6 +36,21 @@ def main() -> None:
     try:
         while True:
             reading = sensor.read()
+
+            # ─── Оценка по порогам ───────────────────
+            result = evaluate(reading, cfg.get("thresholds", {}))
+            worst = result.worst_level.value.upper()
+
+            # Логируем только то, что не OK — чтобы не засорять вывод
+            problematic = [
+                f"{s.name}={s.value:.2f}({s.level.value})"
+                for s in result.statuses.values()
+                if s.level.value != "ok"
+            ]
+            if problematic:
+                log.warning("thresholds [%s]: %s", worst, ", ".join(problematic))
+
+            # ─── Отправка на сервер ──────────────────
             ok = sender.send(node_id, reading)
 
             status = "→ sent" if ok else "→ buffered (server unreachable)"
