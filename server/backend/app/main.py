@@ -4,7 +4,8 @@ from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI, Header, HTTPException
 from pydantic import BaseModel, Field
-
+from app.api.commands import router as commands_router
+from app.api.config import router as config_router
 from app.config import settings
 from app.db.base import Base
 from app.db.session import engine
@@ -37,14 +38,14 @@ async def lifespan(app: FastAPI):
     log.info("DB ready")
     yield
 
-
 app = FastAPI(
     title="LabWatch API",
     version="0.1.0",
     description="Мониторинг и управление серверной/домашней лабораторией",
     lifespan=lifespan,
 )
-
+app.include_router(commands_router)
+app.include_router(config_router)
 
 # ─── Схемы ──────────────────────────────────────────────
 class TelemetryIn(BaseModel):
