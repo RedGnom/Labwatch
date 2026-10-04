@@ -37,7 +37,8 @@ class IncidentLog:
         changed = current.changed_vs(previous)
         if not changed:
             return []
-
+        if previous is None:
+            return []
         with self._lock:
             with self._path.open("a", encoding="utf-8") as f:
                 for s in changed:
